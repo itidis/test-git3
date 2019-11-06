@@ -1,0 +1,47 @@
+*** Settings ***
+Library           Collections
+Library           requests
+Library           RequestsLibrary
+Resource          mykeyword.txt
+
+*** Variables ***
+${url}            http://admintest.measure.cloudream.net
+
+*** Keywords ***
+token
+    create session    api    ${url}
+    ${headers-login}    create dictionary    Accept=application/json\, text/plain\, */*    Accept-Encoding=gzip\, deflate    Accept-Language=zh-CN    Cache-Control=no-cache    Connection=Keep-Alive
+    ...    Content-Length=42    Content-Type=application/json; charset=utf-8    Host=admintest.measure.cloudream.net    Origin=http://admintest.measure.cloudream.net    Referer=http://admintest.measure.cloudream.net/login.html    token=[object Object]
+    ...    User-Agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362
+    ${data}    set variable    {"account": "xiaoquan","passwd": "sz123456"}
+    ${res}    post request    api    /api/measuremanage/admin/login    data=${data}    headers=${headers-login}
+    log    ${res}
+    ${resjson}    to json    ${res.content}
+    ${rescode}    get from dictionary    ${resjson}    code
+    should be equal as strings    ${rescode}    0
+    ${getdata}    get from dictionary    ${resjson}    data
+    ${gettoken}    get from dictionary    ${getdata}    token
+    set suite variable    ${settoken}   ${gettoken}
+    log    ${settoken}
+    [Return]    ${settoken}
+
+登陆流程
+    [Arguments]  ${user}  ${password}
+    创建session  api  ${url}
+    ${headers}=  设置头部信息-无token
+    ${datas}=  设置参数  {"account":"${user}","passwd":"${password}"}
+    ${res}=  post请求  api  /api/measuremanage/admin/login  data=${datas}  headers=${headers}
+    ${resjson}=  结果转换为json  ${res.content}
+    [Return]  ${resjson}
+
+获取token
+    ${resjson}=  登陆流程  xiaoquan  sz123456
+    ${getcode}=  从字典获取  ${resjson}  code
+    ${getdata}=  从字典获取  ${resjson}  data
+    ${gettoken}=  从字典获取  ${getdata}  token
+    结果断言  ${getcode}  0
+    set global variable  ${gettoken}
+    [Return]  ${gettoken}
+
+
+    

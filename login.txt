@@ -1,0 +1,80 @@
+*** Settings ***
+Library           requests
+Library           RequestsLibrary
+Library           Collections
+Resource          testflow.txt
+Resource          mykeyword.txt
+
+*** Variables ***
+${url}            http://admintest.measure.cloudream.net    # 设置后台地址
+
+*** Test Cases ***
+#001-login-success_celiangzhushou
+#    [Tags]  normal
+#    create session  api   http://112.74.187.73:50500
+#    ${headers}  create dictionary  Content-Type=application/json    debug=debug
+#    ${data}  set variable  {"username":"xiaoquan","password":"sz123456","remember":1}
+#    ${res}  post request  api  /api/measureTool/store/login   data=${data}   headers=${headers}
+#    log  ${res}
+#    ${resjson}  to json  ${res.content}
+#    ${rescode}  get from dictionary  ${resjson}  code
+#    should be equal as strings  ${rescode}  0
+#    ${getdata}  get from dictionary  ${resjson}  data
+#    ${gettoken}  get from dictionary  ${getdata}  token
+#    ${token}    set global variable  ${gettoken}
+
+#后台登录
+login_fail_username_notexist
+    ${resjson}=  登陆流程  xiao  123
+    ${getcode}  从字典获取  ${resjson}  code
+    ${getmsg}  从字典获取  ${resjson}  msg
+    结果断言  ${getcode}  100
+    结果断言  ${getmsg}  用户不存在
+
+login_fail_username_empty
+    ${resjson}=  登陆流程  ${empty}  123
+    ${getcode}  从字典获取  ${resjson}  code
+    ${getmsg}  从字典获取  ${resjson}  msg
+    结果断言  ${getcode}  100
+    结果断言  ${getmsg}  用户名无效
+#
+#login_fail_password_error
+#    create session  api  ${url}
+#    ${headers}  create dictionary  token=[object Object]  User-Agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362
+#    ${datas}  set variable  {"account":"xiaoquan","passwd":"12346788"}
+#    ${res}  post request  api   /api/measuremanage/admin/login  data=${datas}  headers=${headers}
+#    ${resjson}  to json  ${res.content}
+#    ${getcode}  get from dictionary  ${resjson}  code
+#    ${getmsg}  get from dictionary  ${resjson}  msg
+#    should be equal as strings  ${getcode}  100
+#    should be equal as strings  ${getmsg}  密码错误
+#
+#login_fail_password_error_daxiaoxie
+#    create session  api  ${url}
+#    ${headers}  create dictionary  token=[object Object]  User-Agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362
+#    ${datas}  set variable  {"account":"xiaoquan","passwd":"SZ123456"}
+#    ${res}  post request  api   /api/measuremanage/admin/login  data=${datas}  headers=${headers}
+#    ${resjson}  to json  ${res.content}
+#    ${getcode}  get from dictionary  ${resjson}  code
+#    ${getmsg}  get from dictionary  ${resjson}  msg
+#    should be equal as strings  ${getcode}  100
+#    should be equal as strings  ${getmsg}  密码错误
+#
+#login_fail_password_empty
+#    create session  api  ${url}
+#    ${headers}  create dictionary  token=[object Object]  User-Agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362
+#    ${datas}  set variable  {"account":"xiaoquan","passwd":""}
+#    ${res}  post request  api   /api/measuremanage/admin/login  data=${datas}  headers=${headers}
+#    ${resjson}  to json  ${res.content}
+#    ${getcode}  get from dictionary  ${resjson}  code
+#    ${getmsg}  get from dictionary  ${resjson}  msg
+#    should be equal as strings  ${getcode}  100
+#    should be equal as strings  ${getmsg}  密码为空
+#
+login_success
+    ${resjson}=  登陆流程  xiaoquan  sz123456
+    ${getcode}  从字典获取  ${resjson}  code
+    ${getdata}  从字典获取  ${resjson}  data
+    ${gettoken}  从字典获取  ${getdata}  token
+    结果断言  ${getcode}  0
+    set global variable  ${gettoken}

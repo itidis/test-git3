@@ -1,0 +1,71 @@
+*** Settings ***
+Library           Collections
+Library           requests
+Library           RequestsLibrary
+
+*** Variables ***
+${url}            http://admintest.measure.cloudream.net
+
+*** Keywords ***
+创建session
+    [Arguments]  ${name}  ${url}
+    create session    ${name}    ${url}
+    [Return]  ${name}
+
+设置头部信息-无token
+    ${headers1}    create dictionary    User-Agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362
+    ...    Content-Length=99    Host=admintest.measure.cloudream.net    Origin=http://admintest.measure.cloudream.net    Referer=http://admintest.measure.cloudream.net/enter    Cache-Control=no-cache
+    ...    Accept=application/json\, text/plain\, */*    Accept-Encoding=gzip\, deflate    Accept-Language=zh-CN    Connection=Keep-Alive
+    ...    Content-Type=application/json; charset=utf-8
+    [Return]  ${headers1}
+
+设置头部信息-有token
+    [Arguments]  ${token}
+    ${headers2}    create dictionary    token=${token}  User-Agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36 Edge/18.18362
+    ...    Content-Length=99    Host=admintest.measure.cloudream.net    Origin=http://admintest.measure.cloudream.net    Referer=http://admintest.measure.cloudream.net/enter    Cache-Control=no-cache
+    ...    Accept=application/json\, text/plain\, */*    Accept-Encoding=gzip\, deflate    Accept-Language=zh-CN    Connection=Keep-Alive
+    ...    Content-Type=application/json; charset=utf-8
+    [Return]  ${headers2}
+
+设置参数
+    [Arguments]  ${data2}
+    ${data1}  set variable  ${data2}
+    [Return]  ${data1}
+
+设置字典
+    [Arguments]  ${data}  ${data1}
+    ${data}  create dictionary  ${data1}
+
+从字典获取
+    [Arguments]  ${dict}  ${key}
+    ${getvalue}  get from dictionary  ${dict}  ${key}
+    [Return]  ${getvalue}
+
+get请求
+    [Arguments]  ${res}  ${url}  ${api}  ${headers}
+    ${res}  get request  ${url}   ${api}  headers=${headers}
+    [Return]  ${res}
+
+post请求
+    [Arguments]  ${url}  ${api}  ${data}  ${headers}
+    ${res}  post request  ${url}   ${api}  data=${data}  headers=${headers}
+    [Return]  ${res}
+
+options请求
+    [Arguments]  ${res}  ${url}  ${api}  ${headers}
+    ${res}  options request  ${url}   ${api}  headers=${headers}
+    [Return]  ${res}
+
+结果转换为json
+    [Arguments]  ${res}
+    ${rescontent}  to json  ${res}
+    [Return]  ${rescontent}
+
+结果断言
+    [Arguments]  ${data1}  ${data2}
+    should be equal as strings  ${data1}  ${data2}
+
+删除session
+    delete all sessions
+
+    
